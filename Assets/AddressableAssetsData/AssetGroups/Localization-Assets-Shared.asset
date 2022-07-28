@@ -22,6 +22,11 @@ MonoBehaviour:
       Shared Data.asset
     m_ReadOnly: 1
     m_SerializedLabels: []
+  - m_GUID: 0cde49a626aaf3943b076dab99fc8e6b
+    m_Address: Assets/Example/StringTableCollection/ExampleTitleLabel/ExampleTitleLable
+      Shared Data.asset
+    m_ReadOnly: 1
+    m_SerializedLabels: []
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 61c395ca78ba05444ae5d2c91320f816, type: 2}
   m_SchemaSet:
