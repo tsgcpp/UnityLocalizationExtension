@@ -3,6 +3,9 @@ name: WIP Pull Localization from Google Sheets
 on:
   workflow_dispatch: {}
 
+env:
+  TEMP_KEY_JSON_PATH: 'Temp/UnityLocalizationExtension/service-account-key.json'
+
 jobs:
   pull-localization-tables:
     name: Pull Localization Tables
@@ -12,16 +15,26 @@ jobs:
         with:
           lfs: true
 
+      - name: Generate Temp Key Json
+        shell: bash
+        run: |
+          mkdir -p $(dirname "${{ env.TEMP_KEY_JSON_PATH }}")
+          echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_JSON }}" > "${{ env.TEMP_KEY_JSON_PATH }}"
+
       - name: Execute PullAllLocalizationTables
         uses: game-ci/unity-builder@v2
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_LOCALIZATION_GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_JSON }}
         with:
           projectPath: ./
           unityVersion: 2021.3.6f1
           targetPlatform: Android
-          buildMethod: Tsgcpp.Localization.Extension.Example.Editor.ExampleLocalizationSynchronizationMenu.PullAllLocalizationTablesWithGoogleServiceAccount
+          buildMethod: Tsgcpp.Localization.Extension.Example.Editor.ExampleLocalizationSynchronizationMenu.PullAllLocalizationTablesFromTempKeyJson
+
+      - name: Delete Temp Key Json
+        if: always()
+        run: |
+          rm -f "${{ env.TEMP_KEY_JSON_PATH }}"
 
       - name: Git diff
         shell: bash
