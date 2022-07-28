@@ -1,0 +1,20 @@
+{
+    "name": "Tsgcpp.Localization.Extension.Example.Editor",
+    "rootNamespace": "Tsgcpp.Localization.Extension.Example.Editor",
+    "references": [
+        "GUID:eec0964c48f6f4e40bc3ec2257ccf8c5",
+        "GUID:2e77701fe0ceda44fb763f03ee704c37",
+        "GUID:4bfeee22632d84b45bc2cb96e27cd85d"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
