@@ -1,6 +1,8 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEditor.Localization;
 using UnityEditor.Localization.Plugins.Google;
 using UnityEditor.Localization.Reporting;
@@ -17,7 +19,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             bool createUndo = false)
         {
             var sheetsExtension = GetGoogleSheetsExtension(collection);
-            var sheets = new GoogleSheets(serviceProvider);
+            var sheets = GetGoogleSheets(serviceProvider, sheetsExtension);
 
             try
             {
@@ -33,11 +35,14 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             {
                 throw new LocalizationExtensionException($"Failed to pull \"{collection.name}\" from Google Sheets.", e);
             }
+
+            Debug.Log($"Pull \"{collection.name}\" from Google Sheets.");
         }
 
         public static void PullAllLocales(
             this IEnumerable<StringTableCollection> collections,
             IGoogleSheetsService serviceProvider,
+            float sleepSecondsPerRequest = 0.5f,
             bool removeMissingEntries = false,
             ITaskReporter reporter = null,
             bool createUndo = false)
@@ -52,6 +57,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             {
                 try
                 {
+                    Sleep(sleepSecondsPerRequest);
                     collection.PullAllLocales(
                         serviceProvider: serviceProvider,
                         removeMissingEntries: removeMissingEntries,
@@ -77,7 +83,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             ITaskReporter reporter = null)
         {
             var sheetsExtension = GetGoogleSheetsExtension(collection);
-            var sheets = new GoogleSheets(serviceProvider);
+            var sheets = GetGoogleSheets(serviceProvider, sheetsExtension);
 
             try
             {
@@ -91,11 +97,14 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             {
                 throw new LocalizationExtensionException($"Failed to push \"{collection.name}\" to Google Sheets.", e);
             }
+
+            Debug.Log($"Push \"{collection.name}\" to Google Sheets.");
         }
 
         public static void PushAllLocales(
             this IEnumerable<StringTableCollection> collections,
             IGoogleSheetsService serviceProvider,
+            float sleepSecondsPerRequest = 0.5f,
             ITaskReporter reporter = null)
         {
             if (collections == null)
@@ -108,6 +117,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             {
                 try
                 {
+                    Sleep(sleepSecondsPerRequest);
                     collection.PushAllLocales(
                         serviceProvider: serviceProvider,
                         reporter: reporter);
@@ -125,6 +135,18 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             }
         }
 
+        private static GoogleSheets GetGoogleSheets(
+            IGoogleSheetsService serviceProvider,
+            GoogleSheetsExtension sheetsExtension)
+        {
+            var sheets = new GoogleSheets(serviceProvider);
+
+            // FYI: SpreadsheetId won't set if is not through the editor (GoogleSheetsExtensionPropertyDrawerData)
+            sheets.SpreadSheetId = sheetsExtension.SpreadsheetId;
+
+            return sheets;
+        }
+
         private static GoogleSheetsExtension GetGoogleSheetsExtension(StringTableCollection collection)
         {
             if (!collection)
@@ -139,6 +161,11 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             }
 
             return googleSheetsExtension;
+        }
+
+        private static void Sleep(float sleepSecondsPerRequest)
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(sleepSecondsPerRequest));
         }
     }
 }
