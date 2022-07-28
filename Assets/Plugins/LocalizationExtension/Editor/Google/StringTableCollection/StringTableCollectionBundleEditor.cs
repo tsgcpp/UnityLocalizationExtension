@@ -14,6 +14,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
+            EditorGUILayout.Space(16);
 
             DrawToolsWithSheetsServiceProvider();
             EditorGUILayout.Space(8);
