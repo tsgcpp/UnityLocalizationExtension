@@ -17,7 +17,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             bool createUndo = false)
         {
             var sheetsExtension = GetGoogleSheetsExtension(collection);
-            var sheets = new GoogleSheets(serviceProvider);
+            var sheets = GetGoogleSheets(serviceProvider, sheetsExtension);
 
             try
             {
@@ -77,7 +77,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             ITaskReporter reporter = null)
         {
             var sheetsExtension = GetGoogleSheetsExtension(collection);
-            var sheets = new GoogleSheets(serviceProvider);
+            var sheets = GetGoogleSheets(serviceProvider, sheetsExtension);
 
             try
             {
@@ -123,6 +123,18 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             {
                 throw new LocalizationExtensionException("Failed to push to Google Sheets.");
             }
+        }
+
+        private static GoogleSheets GetGoogleSheets(
+            IGoogleSheetsService serviceProvider,
+            GoogleSheetsExtension sheetsExtension)
+        {
+            var sheets = new GoogleSheets(serviceProvider);
+
+            // FYI: SpreadsheetId won't set if is is not through the editor (GoogleSheetsExtensionPropertyDrawerData)
+            sheets.SpreadSheetId = sheetsExtension.SpreadsheetId;
+
+            return sheets;
         }
 
         private static GoogleSheetsExtension GetGoogleSheetsExtension(StringTableCollection collection)
