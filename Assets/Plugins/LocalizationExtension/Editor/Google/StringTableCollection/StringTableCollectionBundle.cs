@@ -47,6 +47,9 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
                 removeMissingEntries: removeMissingEntries,
                 reporter: reporter,
                 createUndo: createUndo);
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         public void PushAllLocales(ITaskReporter reporter = null)
