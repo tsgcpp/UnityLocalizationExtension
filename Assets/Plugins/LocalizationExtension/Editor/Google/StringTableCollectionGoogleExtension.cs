@@ -141,7 +141,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         {
             var sheets = new GoogleSheets(serviceProvider);
 
-            // FYI: SpreadsheetId won't set if is is not through the editor (GoogleSheetsExtensionPropertyDrawerData)
+            // FYI: SpreadsheetId won't set if is not through the editor (GoogleSheetsExtensionPropertyDrawerData)
             sheets.SpreadSheetId = sheetsExtension.SpreadsheetId;
 
             return sheets;
