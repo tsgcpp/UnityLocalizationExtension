@@ -5,7 +5,7 @@ using UnityEditor.Localization;
 using UnityEditor.Localization.Plugins.Google;
 using UnityEditor.Localization.Reporting;
 
-namespace Tsgcpp.Localization.Extension.Editor
+namespace Tsgcpp.Localization.Extension.Editor.Google
 {
     public static class StringTableCollectionGoogleExtension
     {
