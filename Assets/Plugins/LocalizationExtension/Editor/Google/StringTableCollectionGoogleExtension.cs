@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -41,6 +42,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         public static void PullAllLocales(
             this IEnumerable<StringTableCollection> collections,
             IGoogleSheetsService serviceProvider,
+            float sleepSecondsPerRequest = 0.5f,
             bool removeMissingEntries = false,
             ITaskReporter reporter = null,
             bool createUndo = false)
@@ -55,6 +57,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             {
                 try
                 {
+                    Sleep(sleepSecondsPerRequest);
                     collection.PullAllLocales(
                         serviceProvider: serviceProvider,
                         removeMissingEntries: removeMissingEntries,
@@ -101,6 +104,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         public static void PushAllLocales(
             this IEnumerable<StringTableCollection> collections,
             IGoogleSheetsService serviceProvider,
+            float sleepSecondsPerRequest = 0.5f,
             ITaskReporter reporter = null)
         {
             if (collections == null)
@@ -113,6 +117,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             {
                 try
                 {
+                    Sleep(sleepSecondsPerRequest);
                     collection.PushAllLocales(
                         serviceProvider: serviceProvider,
                         reporter: reporter);
@@ -156,6 +161,11 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             }
 
             return googleSheetsExtension;
+        }
+
+        private static void Sleep(float sleepSecondsPerRequest)
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(sleepSecondsPerRequest));
         }
     }
 }

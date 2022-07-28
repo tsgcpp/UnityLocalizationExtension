@@ -20,6 +20,11 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         [SerializeField] private List<DefaultAsset> _targetFolders;
         public IReadOnlyList<DefaultAsset> TargetFolders => _targetFolders;
 
+        [Tooltip("Sleep seconds per requests for cool time.")]
+        [Min(0f)]
+        [SerializeField] private float _sleepSecondsPerRequest = 1f;
+        public float SleepSecondsPerRequest => _sleepSecondsPerRequest;
+
         public IReadOnlyList<StringTableCollection> StringTableCollections =>
             AssetFinding.FindAssetsInFolders<StringTableCollection>(TargetFolders);
 
@@ -44,6 +49,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             ValidateProperties();
             StringTableCollections.PullAllLocales(
                 serviceProvider: serviceProvider,
+                sleepSecondsPerRequest: SleepSecondsPerRequest,
                 removeMissingEntries: removeMissingEntries,
                 reporter: reporter,
                 createUndo: createUndo);
@@ -66,7 +72,9 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             ValidateProperties();
             StringTableCollections.PushAllLocales(
                 serviceProvider: serviceProvider,
-                reporter: reporter);
+                reporter: reporter,
+                sleepSecondsPerRequest: SleepSecondsPerRequest);
+
         }
 
         private void ValidateProperties()
