@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEditor.Localization;
 using UnityEditor.Localization.Plugins.Google;
 using UnityEditor.Localization.Reporting;
@@ -33,6 +34,8 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             {
                 throw new LocalizationExtensionException($"Failed to pull \"{collection.name}\" from Google Sheets.", e);
             }
+
+            Debug.Log($"Pull \"{collection.name}\" from Google Sheets.");
         }
 
         public static void PullAllLocales(
@@ -91,6 +94,8 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             {
                 throw new LocalizationExtensionException($"Failed to push \"{collection.name}\" to Google Sheets.", e);
             }
+
+            Debug.Log($"Push \"{collection.name}\" to Google Sheets.");
         }
 
         public static void PushAllLocales(
