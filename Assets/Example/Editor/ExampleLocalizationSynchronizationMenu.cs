@@ -129,7 +129,7 @@ namespace Tsgcpp.Localization.Extension.Example.Editor
         internal static ServiceAccountSheetsServiceProvider GetServiceAccountSheetsServiceProviderFromKeyJson(
             StringTableCollectionBundle bundle)
         {
-            const string JsonKeyPath = "UnityLocalizationExtension/service-account-key.json";
+            const string JsonKeyPath = "SecretCache/UnityLocalizationExtension/service-account-key.json";
             return GetServiceAccountSheetsServiceProviderFromKeyJson(bundle, JsonKeyPath);
         }
 

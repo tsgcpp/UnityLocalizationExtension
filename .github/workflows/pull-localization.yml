@@ -4,7 +4,7 @@ on:
   workflow_dispatch: {}
 
 env:
-  KEY_JSON_PATH: 'UnityLocalizationExtension/service-account-key.json'
+  KEY_JSON_PATH: 'SecretCache/UnityLocalizationExtension/service-account-key.json'
   BASE_BRANCH: ${{ github.ref_name }}
   HEAD_BRANCH: ${{ github.ref_name }}-update
 
@@ -32,7 +32,6 @@ jobs:
           unityVersion: 2021.3.6f1
           targetPlatform: Android
           buildMethod: Tsgcpp.Localization.Extension.Example.Editor.ExampleLocalizationSynchronizationMenu.PullAllLocalizationTablesFromTempKeyJson
-          allowDirtyBuild: true  # for "Generate Key"
 
       - name: Delete Key
         if: always()
@@ -43,10 +42,14 @@ jobs:
         id: commit
         shell: bash
         run: |
-          sed -eux
+          set -eux
 
           git checkout -b ${{ env.HEAD_BRANCH }}
 
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          git reset
           git add --update "Assets/Example/StringTableCollection"
           DIFF_COUNT=$(git diff --staged --name-only | wc -l)
 
@@ -77,10 +80,14 @@ jobs:
             --base "${{ env.BASE_BRANCH }}" \
             --head "${{ env.HEAD_BRANCH }}" \
             --title "${{ steps.commit.outputs.title }}" \
-            --body " " \
+            --body "" \
             )
 
           echo "::notice::${PR_URL} was issued."
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notice
         run: |
