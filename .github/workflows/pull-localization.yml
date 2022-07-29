@@ -74,8 +74,8 @@ jobs:
           REMOTE_SHA=$(git ls-remote --heads origin ${{ env.HEAD_BRANCH }})
           if [ -n "${REMOTE_SHA}" ]
           then
-            git push origin :${{ env.HEAD_BRANCH }}
-            echo "::notice::The remote branch (ref_name: ${{ env.HEAD_BRANCH }}, sha: ${REMOTE_SHA})"
+            git push origin --delete ${{ env.HEAD_BRANCH }}
+            echo "::notice::A already-existing remote branch (ref_name: ${{ env.HEAD_BRANCH }}, sha: ${REMOTE_SHA}) was deleted."
           fi
 
           git push origin ${{ env.HEAD_BRANCH }}
