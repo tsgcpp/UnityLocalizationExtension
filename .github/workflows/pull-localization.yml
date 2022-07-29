@@ -1,4 +1,4 @@
-name: WIP Pull Localization from Google Sheets
+name: Pull Localization from Google Sheets
 
 on:
   workflow_dispatch: {}
