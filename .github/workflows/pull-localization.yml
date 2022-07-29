@@ -4,7 +4,7 @@ on:
   workflow_dispatch: {}
 
 env:
-  TEMP_KEY_JSON_PATH: 'Temp/UnityLocalizationExtension/service-account-key.json'
+  TEMP_KEY_JSON_PATH: 'UnityLocalizationExtension/service-account-key.json'
 
 jobs:
   pull-localization-tables:

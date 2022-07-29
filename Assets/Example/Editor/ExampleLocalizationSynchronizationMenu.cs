@@ -48,7 +48,7 @@ namespace Tsgcpp.Localization.Extension.Example.Editor
         internal static void PullAllLocalizationTablesFromTempKeyJson()
         {
             var bundle = Bundle;
-            var provider = GetServiceAccountSheetsServiceProviderFromTempKeyJson(bundle);
+            var provider = GetServiceAccountSheetsServiceProviderFromKeyJson(bundle);
             bundle.PullAllLocales(provider);
         }
 
@@ -91,7 +91,7 @@ namespace Tsgcpp.Localization.Extension.Example.Editor
         internal static void PushAllLocalizationTablesWithGoogleServiceAccountFromTempKeyJson()
         {
             var bundle = Bundle;
-            var provider = GetServiceAccountSheetsServiceProviderFromTempKeyJson(bundle);
+            var provider = GetServiceAccountSheetsServiceProviderFromKeyJson(bundle);
             bundle.PushAllLocales(provider);
         }
 
@@ -99,15 +99,21 @@ namespace Tsgcpp.Localization.Extension.Example.Editor
 
         #region Service Account Key from Environment Variable
 
-        private const string EnvironmentGoogleServiceAccountKey = "UNITY_LOCALIZATION_GOOGLE_SERVICE_ACCOUNT_KEY";
-
         internal static ServiceAccountSheetsServiceProvider GetServiceAccountSheetsServiceProvider(
             StringTableCollectionBundle bundle)
         {
-            var serviceAccountKeyJson = Environment.GetEnvironmentVariable(EnvironmentGoogleServiceAccountKey);
+            const string EnvironmentGoogleServiceAccountKey = "UNITY_LOCALIZATION_GOOGLE_SERVICE_ACCOUNT_KEY";
+            return GetServiceAccountSheetsServiceProvider(bundle, EnvironmentGoogleServiceAccountKey);
+        }
+
+        internal static ServiceAccountSheetsServiceProvider GetServiceAccountSheetsServiceProvider(
+            StringTableCollectionBundle bundle,
+            string keyEnvironmentVariableName)
+        {
+            var serviceAccountKeyJson = Environment.GetEnvironmentVariable(keyEnvironmentVariableName);
             if (string.IsNullOrEmpty(serviceAccountKeyJson))
             {
-                throw new InvalidOperationException($"Environment variable \"{EnvironmentGoogleServiceAccountKey}\" is not set.");
+                throw new InvalidOperationException($"Environment variable \"{keyEnvironmentVariableName}\" is not set.");
             }
 
             var provider = new ServiceAccountSheetsServiceProvider(
@@ -118,22 +124,28 @@ namespace Tsgcpp.Localization.Extension.Example.Editor
 
         #endregion
 
-        #region Service Account Key from Temp Json
+        #region Service Account Key from Json File
 
-        private const string TempJsonKeyPath = "Temp/UnityLocalizationExtension/service-account-key.json";
-
-        internal static ServiceAccountSheetsServiceProvider GetServiceAccountSheetsServiceProviderFromTempKeyJson(
+        internal static ServiceAccountSheetsServiceProvider GetServiceAccountSheetsServiceProviderFromKeyJson(
             StringTableCollectionBundle bundle)
         {
-            if (!File.Exists(TempJsonKeyPath))
+            const string JsonKeyPath = "UnityLocalizationExtension/service-account-key.json";
+            return GetServiceAccountSheetsServiceProviderFromKeyJson(bundle, JsonKeyPath);
+        }
+
+        internal static ServiceAccountSheetsServiceProvider GetServiceAccountSheetsServiceProviderFromKeyJson(
+            StringTableCollectionBundle bundle,
+            string keyJsonPath)
+        {
+            if (!File.Exists(keyJsonPath))
             {
-                throw new InvalidOperationException($"File \"{TempJsonKeyPath}\" is not found.");
+                throw new InvalidOperationException($"File \"{keyJsonPath}\" is not found.");
             }
 
-            string serviceAccountKeyJson = File.ReadAllText(TempJsonKeyPath);
+            string serviceAccountKeyJson = File.ReadAllText(keyJsonPath);
             if (string.IsNullOrEmpty(serviceAccountKeyJson))
             {
-                throw new InvalidOperationException($"File \"{TempJsonKeyPath}\" is empty.");
+                throw new InvalidOperationException($"File \"{keyJsonPath}\" is empty.");
             }
 
             var provider = new ServiceAccountSheetsServiceProvider(
