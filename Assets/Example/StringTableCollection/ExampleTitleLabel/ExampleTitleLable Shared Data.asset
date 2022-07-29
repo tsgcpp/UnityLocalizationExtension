@@ -19,6 +19,10 @@ MonoBehaviour:
     m_Key: Title_Name
     m_Metadata:
       m_Items: []
+  - m_Id: 503221312659456
+    m_Key: Title_Description
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
