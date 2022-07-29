@@ -19,7 +19,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p $(dirname "${{ env.TEMP_KEY_JSON_PATH }}")
-          echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_JSON }}" > "${{ env.TEMP_KEY_JSON_PATH }}"
+          echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_JSON_BASE64 }}" | base64 --decode > "${{ env.TEMP_KEY_JSON_PATH }}"
 
       - name: Execute PullAllLocalizationTables
         uses: game-ci/unity-builder@v2
