@@ -6,7 +6,7 @@ on:
 env:
   KEY_JSON_PATH: 'SecretCache/UnityLocalizationExtension/service-account-key.json'
   BASE_BRANCH: ${{ github.ref_name }}
-  HEAD_BRANCH: ${{ github.ref_name }}-update
+  HEAD_BRANCH: update_stringtablecollection-${{ github.ref_name }}
 
 jobs:
   pull-localization-tables:
@@ -85,7 +85,7 @@ jobs:
           PR_URL=$(gh pr create \
             --base "${{ env.BASE_BRANCH }}" \
             --head "${{ env.HEAD_BRANCH }}" \
-            --title "${{ steps.commit.outputs.title }}" \
+            --title "[CI] ${{ steps.commit.outputs.title }}" \
             --body "" \
             )
 
