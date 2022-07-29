@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEditor;
 using Tsgcpp.Localization.Extension.Editor.Google;
+using System.IO;
 
 namespace Tsgcpp.Localization.Extension.Example.Editor
 {
@@ -12,8 +13,6 @@ namespace Tsgcpp.Localization.Extension.Example.Editor
         /// <summary>
         /// Environment variable name for Google Sheets API key (Json format).
         /// </summary>
-        private const string EnvironmentGoogleServiceAccountKey = "UNITY_LOCALIZATION_GOOGLE_SERVICE_ACCOUNT_KEY";
-
         [MenuItem("Localization Extension Example/Pull All Localization Tables", false, priority = 1)]
         internal static void PullAllLocalizationTablesMenu()
         {
@@ -35,6 +34,21 @@ namespace Tsgcpp.Localization.Extension.Example.Editor
         {
             var bundle = Bundle;
             var provider = GetServiceAccountSheetsServiceProvider(bundle);
+            bundle.PullAllLocales(provider);
+        }
+
+        /// <summary>
+        /// Pull all StringTables in StringTableCollectionBundle from Google Spreadsheet.
+        /// </summary>
+        /// <remarks>
+        /// This method can also be used in CI.
+        /// This is for environments that cannot use environment variables.
+        /// FYI: GameCI cannot use additional environemnt variables.
+        /// </remarks>
+        internal static void PullAllLocalizationTablesFromTempKeyJson()
+        {
+            var bundle = Bundle;
+            var provider = GetServiceAccountSheetsServiceProviderFromKeyJson(bundle);
             bundle.PullAllLocales(provider);
         }
 
@@ -66,15 +80,40 @@ namespace Tsgcpp.Localization.Extension.Example.Editor
             bundle.PushAllLocales(provider);
         }
 
+        /// <summary>
+        /// Push all StringTables in StringTableCollectionBundle to Google Spreadsheet.
+        /// </summary>
+        /// <remarks>
+        /// This method can also be used in CI.
+        /// This is for environments that cannot use environment variables.
+        /// FYI: GameCI cannot use additional environemnt variables.
+        /// </remarks>
+        internal static void PushAllLocalizationTablesWithGoogleServiceAccountFromTempKeyJson()
+        {
+            var bundle = Bundle;
+            var provider = GetServiceAccountSheetsServiceProviderFromKeyJson(bundle);
+            bundle.PushAllLocales(provider);
+        }
+
         #endregion
+
+        #region Service Account Key from Environment Variable
 
         internal static ServiceAccountSheetsServiceProvider GetServiceAccountSheetsServiceProvider(
             StringTableCollectionBundle bundle)
         {
-            var serviceAccountKeyJson = Environment.GetEnvironmentVariable(EnvironmentGoogleServiceAccountKey);
+            const string EnvironmentGoogleServiceAccountKey = "UNITY_LOCALIZATION_GOOGLE_SERVICE_ACCOUNT_KEY";
+            return GetServiceAccountSheetsServiceProvider(bundle, EnvironmentGoogleServiceAccountKey);
+        }
+
+        internal static ServiceAccountSheetsServiceProvider GetServiceAccountSheetsServiceProvider(
+            StringTableCollectionBundle bundle,
+            string keyEnvironmentVariableName)
+        {
+            var serviceAccountKeyJson = Environment.GetEnvironmentVariable(keyEnvironmentVariableName);
             if (string.IsNullOrEmpty(serviceAccountKeyJson))
             {
-                throw new InvalidOperationException($"Environment variable \"{EnvironmentGoogleServiceAccountKey}\" is not set.");
+                throw new InvalidOperationException($"Environment variable \"{keyEnvironmentVariableName}\" is not set.");
             }
 
             var provider = new ServiceAccountSheetsServiceProvider(
@@ -82,6 +121,40 @@ namespace Tsgcpp.Localization.Extension.Example.Editor
                 applicationName: bundle.SheetsServiceProvider.ApplicationName);
             return provider;
         }
+
+        #endregion
+
+        #region Service Account Key from Json File
+
+        internal static ServiceAccountSheetsServiceProvider GetServiceAccountSheetsServiceProviderFromKeyJson(
+            StringTableCollectionBundle bundle)
+        {
+            const string JsonKeyPath = "SecretCache/UnityLocalizationExtension/service-account-key.json";
+            return GetServiceAccountSheetsServiceProviderFromKeyJson(bundle, JsonKeyPath);
+        }
+
+        internal static ServiceAccountSheetsServiceProvider GetServiceAccountSheetsServiceProviderFromKeyJson(
+            StringTableCollectionBundle bundle,
+            string keyJsonPath)
+        {
+            if (!File.Exists(keyJsonPath))
+            {
+                throw new InvalidOperationException($"File \"{keyJsonPath}\" is not found.");
+            }
+
+            string serviceAccountKeyJson = File.ReadAllText(keyJsonPath);
+            if (string.IsNullOrEmpty(serviceAccountKeyJson))
+            {
+                throw new InvalidOperationException($"File \"{keyJsonPath}\" is empty.");
+            }
+
+            var provider = new ServiceAccountSheetsServiceProvider(
+                serviceAccountKeyJson: serviceAccountKeyJson,
+                applicationName: bundle.SheetsServiceProvider.ApplicationName);
+            return provider;
+        }
+
+        #endregion
 
         private const string BundlePath = "Assets/Example/StringTableCollectionBundle/StringTableCollectionBundle.asset";
 
@@ -97,6 +170,5 @@ namespace Tsgcpp.Localization.Extension.Example.Editor
 
             return bundle;
         }
-
     }
 }
