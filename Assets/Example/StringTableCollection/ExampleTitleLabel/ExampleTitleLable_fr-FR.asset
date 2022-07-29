@@ -22,6 +22,10 @@ MonoBehaviour:
     m_Localized: Titre
     m_Metadata:
       m_Items: []
+  - m_Id: 506495482830848
+    m_Localized: La description
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
