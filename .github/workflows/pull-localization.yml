@@ -71,7 +71,13 @@ jobs:
         if: steps.commit.outputs.has_diff == 'true'
         shell: bash
         run: |
-          git push origin :${{ env.HEAD_BRANCH }}
+          REMOTE_SHA=$(git ls-remote --heads origin ${{ env.HEAD_BRANCH }})
+          if [ -n "${REMOTE_SHA}" ]
+          then
+            git push origin :${{ env.HEAD_BRANCH }}
+            echo "::notice::The remote branch (ref_name: ${{ env.HEAD_BRANCH }}, sha: ${REMOTE_SHA})"
+          fi
+
           git push origin ${{ env.HEAD_BRANCH }}
 
           sleep 2
