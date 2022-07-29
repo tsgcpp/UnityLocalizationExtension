@@ -4,7 +4,9 @@ on:
   workflow_dispatch: {}
 
 env:
-  TEMP_KEY_JSON_PATH: 'UnityLocalizationExtension/service-account-key.json'
+  KEY_JSON_PATH: 'UnityLocalizationExtension/service-account-key.json'
+  BASE_BRANCH: ${{ github.ref_name }}
+  HEAD_BRANCH: ${{ github.ref_name }}-update
 
 jobs:
   pull-localization-tables:
@@ -15,11 +17,11 @@ jobs:
         with:
           lfs: true
 
-      - name: Generate Temp Key Json
+      - name: Generate Key
         shell: bash
         run: |
-          mkdir -p $(dirname "${{ env.TEMP_KEY_JSON_PATH }}")
-          echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_JSON_BASE64 }}" | base64 --decode > "${{ env.TEMP_KEY_JSON_PATH }}"
+          mkdir -p $(dirname "${{ env.KEY_JSON_PATH }}")
+          echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_JSON_BASE64 }}" | base64 --decode > "${{ env.KEY_JSON_PATH }}"
 
       - name: Execute PullAllLocalizationTables
         uses: game-ci/unity-builder@v2
@@ -30,21 +32,56 @@ jobs:
           unityVersion: 2021.3.6f1
           targetPlatform: Android
           buildMethod: Tsgcpp.Localization.Extension.Example.Editor.ExampleLocalizationSynchronizationMenu.PullAllLocalizationTablesFromTempKeyJson
+          allowDirtyBuild: true  # for "Generate Key"
 
-      - name: Delete Temp Key Json
+      - name: Delete Key
         if: always()
         run: |
-          rm -f "${{ env.TEMP_KEY_JSON_PATH }}"
+          rm -f "${{ env.KEY_JSON_PATH }}"
 
-      - name: Git diff
+      - name: Git Commit String Tables
+        id: commit
         shell: bash
         run: |
-          git diff
+          sed -eux
 
-      # - name: Execute PullAllLocalizationTables
-      #   shell: cmd
-      #   run: |
-      #     "C:\Program Files\Unity\Hub\Editor\2021.3.6f1\Editor\Unity.exe" ^
-      #       -projectPath ".\" ^
-      #       -executeMethod "Tsgcpp.Localization.Extension.Example.Editor.ExampleLocalizationSynchronizationMenu.PullAllLocalizationTablesWithGoogleServiceAccount" ^
-      #       -logFile -
+          git checkout -b ${{ env.HEAD_BRANCH }}
+
+          git add --update "Assets/Example/StringTableCollection"
+          DIFF_COUNT=$(git diff --staged --name-only | wc -l)
+
+          if [ "${DIFF_COUNT}" -le 0 ]
+          then
+            echo "::notice::Skipped the commit becuase no differences were found."
+            exit 0
+          fi
+
+          DATE=$(date '+%Y/%m/%d %H:%M')
+          TITLE="Update StringCollectionTable (${DATE})"
+
+          git commit -m "${TITLE}"
+
+          echo "::set-output name=has_diff::true"
+          echo "::set-output name=title::${TITLE}"
+
+      - name: Git Push ans PullRequest
+        if: steps.commit.outputs.has_diff == 'true'
+        shell: bash
+        run: |
+          git push origin :${{ env.HEAD_BRANCH }}
+          git push origin ${{ env.HEAD_BRANCH }}
+
+          sleep 2
+
+          PR_URL=$(gh pr create \
+            --base "${{ env.BASE_BRANCH }}" \
+            --head "${{ env.HEAD_BRANCH }}" \
+            --title "${{ steps.commit.outputs.title }}" \
+            --body " " \
+            )
+
+          echo "::notice::${PR_URL} was issued."
+
+      - name: Notice
+        run: |
+          echo "This is a notification phase"
