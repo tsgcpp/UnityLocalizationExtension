@@ -19,6 +19,10 @@ MonoBehaviour:
     m_Key: Title_Name
     m_Metadata:
       m_Items: []
+  - m_Id: 334100834918400
+    m_Key: CI_PullTest_Name
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
