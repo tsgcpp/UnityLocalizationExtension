@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Localization;
 using UnityEditor.Localization.Plugins.Google;
 
 namespace Tsgcpp.Localization.Extension.Editor.Google
@@ -21,6 +22,8 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
 
             DrawToolsWithServiceAccount();
             EditorGUILayout.Space(8);
+
+            DrawStringTableCollections();
         }
 
         private void DrawToolsWithSheetsServiceProvider()
@@ -52,6 +55,30 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             if (GUILayout.Button("Push All Locales"))
             {
                 PushWithGoogleServiceAccount();
+            }
+        }
+
+        private bool _showStringTableCollections = true;
+
+        private void DrawStringTableCollections()
+        {
+            var foldoutStyle = new GUIStyle(EditorStyles.foldout)
+            {
+                fontStyle = FontStyle.Bold,
+            };
+
+            _showStringTableCollections = EditorGUILayout.Foldout(_showStringTableCollections, "Target \"StringTableCollection\"s", foldoutStyle);
+            if (!_showStringTableCollections)
+            {
+                return;
+            }
+
+            var stringTableCollections = Bundle.StringTableCollections;
+            using var h = new EditorGUILayout.VerticalScope(GUI.skin.box);
+            using var g = new EditorGUI.DisabledGroupScope(true);
+            foreach (var collection in stringTableCollections)
+            {
+                EditorGUILayout.ObjectField(collection, typeof(StringTableCollection), allowSceneObjects: false);
             }
         }
 
