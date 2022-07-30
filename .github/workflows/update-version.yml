@@ -1,0 +1,89 @@
+name: Update Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The version that is going to be used."
+        required: true
+
+env:
+  README_PATH: "README.md"
+  PACKAGE_PATH: "Assets/Plugins/LocalizationExtension"
+  BASE_BRANCH: ${{ github.ref_name }}
+  HEAD_BRANCH: update_version-${{ inputs.version }}-${{ github.ref_name }}
+
+jobs:
+  update-version:
+    name: Update Version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+
+      - name: Notice Version
+        shell: bash
+        run: |
+          echo "::notice::Version: \"${{ inputs.version }}\""
+
+      - name: Update Version in package.json
+        id: update-file
+        shell: bash
+        run: |
+          set -eux
+
+          VERSION=${{ inputs.version }}
+
+          PACKAGE_JSON_PATH="${{ env.PACKAGE_PATH }}/package.json"
+          cat "${PACKAGE_JSON_PATH}" | perl -pe 's/(\s*"version":\s*")([^"]+)/${1}'${VERSION}'/g' > "${PACKAGE_JSON_PATH}.tmp"
+          mv "${PACKAGE_JSON_PATH}.tmp" "${PACKAGE_JSON_PATH}"
+          git add "${PACKAGE_JSON_PATH}"
+
+          README_PATH=${{ env.README_PATH }}
+          cat "${README_PATH}" | perl -pe 's/(#[^`]+)(` #version)/#'${VERSION}'${2}/g' > "${README_PATH}.tmp"
+          mv "${README_PATH}.tmp" "${README_PATH}"
+          git add "${README_PATH}"
+
+          DIFF_COUNT=$(git diff --staged --name-only | wc -l)
+
+          if [ "${DIFF_COUNT}" -le 0 ]
+          then
+            echo "::error::There are no changes for \"${VERSION}\""
+            exit 1
+          fi
+
+          echo "::set-output name=has_update::true"
+
+      - name: Commit, Push and PullRequest
+        if: steps.update-file.outputs.has_update == 'true'
+        shell: bash
+        run: |
+          set -eux
+
+          VERSION=${{ inputs.version }}
+
+          git checkout -b ${{ env.HEAD_BRANCH }}
+
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          TITLE="Update version to \"${VERSION}\""
+
+          git commit -m "${TITLE}"
+          git push origin ${{ env.HEAD_BRANCH }}
+
+          sleep 2
+
+          PR_URL=$(gh pr create \
+            --base "${{ env.BASE_BRANCH }}" \
+            --head "${{ env.HEAD_BRANCH }}" \
+            --title "[CI] ${TITLE}" \
+            --body "" \
+            )
+
+          echo "::notice::${PR_URL} was issued."
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
