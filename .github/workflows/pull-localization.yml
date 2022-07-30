@@ -71,6 +71,8 @@ jobs:
         if: steps.commit.outputs.has_diff == 'true'
         shell: bash
         run: |
+          set -eux
+
           REMOTE_SHA=$(git ls-remote --heads origin ${{ env.HEAD_BRANCH }})
           if [ -n "${REMOTE_SHA}" ]
           then
