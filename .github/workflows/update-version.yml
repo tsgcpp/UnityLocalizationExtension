@@ -41,7 +41,7 @@ jobs:
           git add "${PACKAGE_JSON_PATH}"
 
           README_PATH=${{ env.README_PATH }}
-          cat "${README_PATH}" | perl -pe 's/(#[^`]+)(` #version)/#'${VERSION}'${2}/g' > "${README_PATH}.tmp"
+          cat "${README_PATH}" | perl -pe 's/(#[^`]+)(` <version>)/#'${VERSION}'${2}/g' > "${README_PATH}.tmp"
           mv "${README_PATH}.tmp" "${README_PATH}"
           git add "${README_PATH}"
 
