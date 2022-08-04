@@ -15,19 +15,16 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
 
         public override void OnInspectorGUI()
         {
-            using (var changeCheck = new EditorGUI.ChangeCheckScope())
-            {
-                DrawDefaultInspector();
-                EditorGUILayout.Space(16);
+            DrawDefaultInspector();
+            EditorGUILayout.Space(16);
 
-                DrawToolsWithSheetsServiceProvider();
-                EditorGUILayout.Space(8);
+            DrawToolsWithSheetsServiceProvider();
+            EditorGUILayout.Space(8);
 
-                DrawToolsWithServiceAccount();
-                EditorGUILayout.Space(8);
+            DrawToolsWithServiceAccount();
+            EditorGUILayout.Space(8);
 
-                DrawStringTableCollections(changeCheck.changed);
-            }
+            DrawStringTableCollections();
         }
 
         private void DrawToolsWithSheetsServiceProvider()
@@ -63,9 +60,11 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         }
 
         private bool _showStringTableCollections = true;
-        private IReadOnlyList<StringTableCollection> _stringTableCollectionsCache = new List<StringTableCollection>();
+        private readonly CacheListConverter<DefaultAsset, StringTableCollection> _stringTableCollectionsConverter =
+            new CacheListConverter<DefaultAsset, StringTableCollection>(
+                actualConverter: new FolderToCollectionConverter());
 
-        private void DrawStringTableCollections(bool guiChanged)
+        private void DrawStringTableCollections()
         {
             var foldoutStyle = new GUIStyle(EditorStyles.foldout)
             {
@@ -73,18 +72,8 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             };
 
             _showStringTableCollections = EditorGUILayout.Foldout(_showStringTableCollections, "Target \"StringTableCollection\"s", foldoutStyle);
-            if (!_showStringTableCollections)
-            {
-                _stringTableCollectionsCache = null;
-                return;
-            }
 
-            if (_stringTableCollectionsCache == null || guiChanged)
-            {
-                _stringTableCollectionsCache = Bundle.StringTableCollections;
-            }
-
-            var stringTableCollections = Bundle.StringTableCollections;
+            var stringTableCollections = _stringTableCollectionsConverter.Convert(Bundle.TargetFolders);
             using var h = new EditorGUILayout.VerticalScope(GUI.skin.box);
             using var g = new EditorGUI.DisabledGroupScope(true);
             foreach (var collection in stringTableCollections)
@@ -138,6 +127,14 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
                 serviceAccountKeyJson: keyJson,
                 applicationName: sheetsSesrvicesProvider.ApplicationName);
             return provider;
+        }
+
+        private sealed class FolderToCollectionConverter : IListConverter<DefaultAsset, StringTableCollection>
+        {
+            public IReadOnlyList<StringTableCollection> Convert(IReadOnlyList<DefaultAsset> list)
+            {
+                return AssetFinding.FindAssetsInFolders<StringTableCollection>(list);
+            }
         }
     }
 }
