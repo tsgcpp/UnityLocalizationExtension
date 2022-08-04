@@ -16,6 +16,7 @@ namespace Tsgcpp.Localization.Extension.Editor
             }
 
             var folderPathList = folders
+                .Where(folder => folder != null)
                 .Select(AssetDatabase.GetAssetPath)
                 .Where(path => !string.IsNullOrEmpty(path))
                 .Where(path => Directory.Exists(path))
