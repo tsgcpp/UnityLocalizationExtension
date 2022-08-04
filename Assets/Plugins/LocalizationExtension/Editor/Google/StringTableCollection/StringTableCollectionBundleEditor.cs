@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
@@ -14,16 +15,19 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
 
         public override void OnInspectorGUI()
         {
-            DrawDefaultInspector();
-            EditorGUILayout.Space(16);
+            using (var changeCheck = new EditorGUI.ChangeCheckScope())
+            {
+                DrawDefaultInspector();
+                EditorGUILayout.Space(16);
 
-            DrawToolsWithSheetsServiceProvider();
-            EditorGUILayout.Space(8);
+                DrawToolsWithSheetsServiceProvider();
+                EditorGUILayout.Space(8);
 
-            DrawToolsWithServiceAccount();
-            EditorGUILayout.Space(8);
+                DrawToolsWithServiceAccount();
+                EditorGUILayout.Space(8);
 
-            DrawStringTableCollections();
+                DrawStringTableCollections(changeCheck.changed);
+            }
         }
 
         private void DrawToolsWithSheetsServiceProvider()
@@ -59,8 +63,9 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         }
 
         private bool _showStringTableCollections = true;
+        private IReadOnlyList<StringTableCollection> _stringTableCollectionsCache = new List<StringTableCollection>();
 
-        private void DrawStringTableCollections()
+        private void DrawStringTableCollections(bool guiChanged)
         {
             var foldoutStyle = new GUIStyle(EditorStyles.foldout)
             {
@@ -70,7 +75,13 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             _showStringTableCollections = EditorGUILayout.Foldout(_showStringTableCollections, "Target \"StringTableCollection\"s", foldoutStyle);
             if (!_showStringTableCollections)
             {
+                _stringTableCollectionsCache = null;
                 return;
+            }
+
+            if (_stringTableCollectionsCache == null || guiChanged)
+            {
+                _stringTableCollectionsCache = Bundle.StringTableCollections;
             }
 
             var stringTableCollections = Bundle.StringTableCollections;
