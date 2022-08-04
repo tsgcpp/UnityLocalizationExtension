@@ -18,7 +18,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
 
         [Tooltip("The folders to search for StringTableCollection assets.")]
         [SerializeField] private List<DefaultAsset> _targetFolders;
-        public IReadOnlyList<DefaultAsset> TargetFolders => _targetFolders;
+        public IReadOnlyList<DefaultAsset> TargetFolders => _targetFolders ??= new List<DefaultAsset>();
 
         [Tooltip("Sleep seconds per requests for cool time.")]
         [Min(0f)]
