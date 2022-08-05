@@ -74,7 +74,6 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
                 serviceProvider: serviceProvider,
                 reporter: reporter,
                 sleepSecondsPerRequest: SleepSecondsPerRequest);
-
         }
 
         private void ValidateProperties()
