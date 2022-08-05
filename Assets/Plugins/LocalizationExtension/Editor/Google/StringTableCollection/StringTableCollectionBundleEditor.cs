@@ -72,10 +72,15 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             };
 
             _showStringTableCollections = EditorGUILayout.Foldout(_showStringTableCollections, "Target \"StringTableCollection\"s", foldoutStyle);
+            if (!_showStringTableCollections)
+            {
+                return;
+            }
 
-            var stringTableCollections = _stringTableCollectionsConverter.Convert(Bundle.TargetFolders);
             using var h = new EditorGUILayout.VerticalScope(GUI.skin.box);
             using var g = new EditorGUI.DisabledGroupScope(true);
+
+            var stringTableCollections = _stringTableCollectionsConverter.Convert(Bundle.TargetFolders);
             foreach (var collection in stringTableCollections)
             {
                 EditorGUILayout.ObjectField(collection, typeof(StringTableCollection), allowSceneObjects: false);
