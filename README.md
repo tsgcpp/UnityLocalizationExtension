@@ -7,7 +7,7 @@ Extension package for Unity Localization
 - Window -> Package Manager
 - Add package from git URL...
 - Add the package URL
-  - e.g. `https://github.com/tsgcpp/UnityLocalizationExtension.git?path=Assets/Plugins/LocalizationExtension#0.1.3` <version>
+  - e.g. `https://github.com/tsgcpp/UnityLocalizationExtension.git?path=Assets/Plugins/LocalizationExtension#0.1.4` <version>
 
 
 ## Feature
