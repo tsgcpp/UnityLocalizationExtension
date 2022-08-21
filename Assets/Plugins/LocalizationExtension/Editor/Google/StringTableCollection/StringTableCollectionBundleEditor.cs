@@ -30,7 +30,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         private void DrawToolsWithSheetsServiceProvider()
         {
             EditorGUILayout.LabelField("Tools (using SheetsServiceProvider)", EditorStyles.boldLabel);
-            using var h = new GUILayout.HorizontalScope();
+            using var h = new EditorGUILayout.HorizontalScope();
             if (GUILayout.Button("Pull All Locales"))
             {
                 var serviceProvider = GetSheetsServiceProvider();
@@ -47,7 +47,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         private void DrawToolsWithServiceAccount()
         {
             EditorGUILayout.LabelField("Tools (using Google Service Account)", EditorStyles.boldLabel);
-            using var h = new GUILayout.HorizontalScope();
+            using var h = new EditorGUILayout.HorizontalScope();
             if (GUILayout.Button("Pull All Locales"))
             {
                 PullWithGoogleServiceAccount();
