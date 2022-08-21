@@ -1,6 +1,6 @@
 {
     "name": "com.tsgcpp.unitylocalizationextension",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "displayName": "UnityLocalizationExtension",
     "description": "Extension package for Unity Localization.",
     "unity": "2020.3",
