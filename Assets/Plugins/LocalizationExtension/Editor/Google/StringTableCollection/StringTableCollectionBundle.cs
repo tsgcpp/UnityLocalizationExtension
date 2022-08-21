@@ -26,7 +26,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         public float SleepSecondsPerRequest => _sleepSecondsPerRequest;
 
         public IReadOnlyList<StringTableCollection> StringTableCollections =>
-            AssetFinding.FindAssetsInFolders<StringTableCollection>(TargetFolders);
+            AssetFinding.FindAssets<StringTableCollection>(TargetFolders);
 
         public void PullAllLocales(
             bool removeMissingEntries = false,

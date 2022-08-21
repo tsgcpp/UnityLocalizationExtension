@@ -13,6 +13,10 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
     {
         private StringTableCollectionBundle Bundle => target as StringTableCollectionBundle;
 
+        private CacheListConverter<DefaultAsset, StringTableCollection> _stringTableCollectionsConverter = null;
+        public CacheListConverter<DefaultAsset, StringTableCollection> StringTableCollectionsConverter =>
+            _stringTableCollectionsConverter ??= new CacheListConverter<DefaultAsset, StringTableCollection>(actualConverter: new FolderToCollectionConverter(Bundle));
+
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
@@ -30,7 +34,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         private void DrawToolsWithSheetsServiceProvider()
         {
             EditorGUILayout.LabelField("Tools (using SheetsServiceProvider)", EditorStyles.boldLabel);
-            using var h = new GUILayout.HorizontalScope();
+            using var h = new EditorGUILayout.HorizontalScope();
             if (GUILayout.Button("Pull All Locales"))
             {
                 var serviceProvider = GetSheetsServiceProvider();
@@ -47,7 +51,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         private void DrawToolsWithServiceAccount()
         {
             EditorGUILayout.LabelField("Tools (using Google Service Account)", EditorStyles.boldLabel);
-            using var h = new GUILayout.HorizontalScope();
+            using var h = new EditorGUILayout.HorizontalScope();
             if (GUILayout.Button("Pull All Locales"))
             {
                 PullWithGoogleServiceAccount();
@@ -60,9 +64,6 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         }
 
         private bool _showStringTableCollections = true;
-        private readonly CacheListConverter<DefaultAsset, StringTableCollection> _stringTableCollectionsConverter =
-            new CacheListConverter<DefaultAsset, StringTableCollection>(
-                actualConverter: new FolderToCollectionConverter());
 
         private void DrawStringTableCollections()
         {
@@ -80,7 +81,13 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
             using var h = new EditorGUILayout.VerticalScope(GUI.skin.box);
             using var g = new EditorGUI.DisabledGroupScope(true);
 
-            var stringTableCollections = _stringTableCollectionsConverter.Convert(Bundle.TargetFolders);
+            var stringTableCollections = StringTableCollectionsConverter.Convert(Bundle.TargetFolders);
+            if (stringTableCollections.Count <= 0)
+            {
+                EditorGUILayout.LabelField("No \"StringTableCollection\"s.");
+                return;
+            }
+
             foreach (var collection in stringTableCollections)
             {
                 EditorGUILayout.ObjectField(collection, typeof(StringTableCollection), allowSceneObjects: false);
@@ -136,9 +143,16 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
 
         private sealed class FolderToCollectionConverter : IListConverter<DefaultAsset, StringTableCollection>
         {
+            private readonly StringTableCollectionBundle _bundle;
+
+            public FolderToCollectionConverter(StringTableCollectionBundle bundle)
+            {
+                _bundle = bundle;
+            }
+
             public IReadOnlyList<StringTableCollection> Convert(IReadOnlyList<DefaultAsset> list)
             {
-                return AssetFinding.FindAssetsInFolders<StringTableCollection>(list);
+                return _bundle.StringTableCollections;
             }
         }
     }

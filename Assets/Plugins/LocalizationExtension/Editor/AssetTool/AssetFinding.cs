@@ -8,11 +8,16 @@ namespace Tsgcpp.Localization.Extension.Editor
 {
     public static class AssetFinding
     {
-        public static IReadOnlyList<T> FindAssetsInFolders<T>(IReadOnlyList<DefaultAsset> folders) where T : UnityEngine.Object
+        public static IReadOnlyList<T> FindAssets<T>(DefaultAsset folder) where T : UnityEngine.Object
+        {
+            return FindAssets<T>(new List<DefaultAsset> { folder });
+        }
+
+        public static IReadOnlyList<T> FindAssets<T>(IReadOnlyList<DefaultAsset> folders) where T : UnityEngine.Object
         {
             if (folders == null)
             {
-                throw new NullReferenceException("folders is null.");
+                return new List<T>();
             }
 
             var folderPathList = folders
@@ -22,10 +27,14 @@ namespace Tsgcpp.Localization.Extension.Editor
                 .Where(path => Directory.Exists(path))
                 .ToList();
 
+            if (folderPathList.Count <= 0)
+            {
+                return new List<T>();
+            }
+
             var assets = AssetDatabase
-                .FindAssets($"t:{typeof(T).Name}")
+                .FindAssets($"t:{typeof(T).Name}", searchInFolders: folderPathList.ToArray())
                 .Select(AssetDatabase.GUIDToAssetPath)
-                .Where(path => folderPathList.Any(folderPath => path.StartsWith(folderPath)))
                 .OrderBy(path => path)
                 .Distinct()
                 .Select(AssetDatabase.LoadAssetAtPath<T>)
