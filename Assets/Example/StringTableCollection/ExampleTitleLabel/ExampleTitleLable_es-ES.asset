@@ -22,6 +22,10 @@ MonoBehaviour:
     m_Localized: "T\xEDtulo"
     m_Metadata:
       m_Items: []
+  - m_Id: 2592136104091648
+    m_Localized: "Descripci\xF3n"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
