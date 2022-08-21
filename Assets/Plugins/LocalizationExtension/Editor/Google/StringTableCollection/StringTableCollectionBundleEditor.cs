@@ -138,7 +138,7 @@ namespace Tsgcpp.Localization.Extension.Editor.Google
         {
             public IReadOnlyList<StringTableCollection> Convert(IReadOnlyList<DefaultAsset> list)
             {
-                return AssetFinding.FindAssetsInFolders<StringTableCollection>(list);
+                return AssetFinding.FindAssets<StringTableCollection>(list);
             }
         }
     }
